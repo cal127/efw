@@ -1,5 +1,6 @@
 - error handling & logging should be greatly leveraged! currently it may
   be buggy!!
+- mod rewrite support!
 - user system is missing!
 - admin panel is missing!
 - routing system is missing!
