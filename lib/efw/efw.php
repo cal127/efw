@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Topics 2 handle:
- *   parse config file
- *     boot
- *       proper logging
- *   core libs
-*/
-
 class EFW {
     public static $conf, $pdo, $roles, $user;
 
