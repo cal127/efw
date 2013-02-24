@@ -1,0 +1,17 @@
+---
+debug: Yes
+url  : http://efw
+db:
+    driver : 
+    host   : 
+    user   : 
+    pass   : 
+    db     : 
+    charset: 
+    prefix : 
+smtp:
+    host: 
+    port: 
+    user: 
+    pass: 
+...
