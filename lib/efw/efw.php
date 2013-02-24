@@ -9,7 +9,7 @@
 */
 
 class EFW {
-    public static $conf, $db, $roles, $user;
+    public static $conf, $pdo, $roles, $user;
 
 
 
@@ -18,7 +18,7 @@ class EFW {
         self::_setupErrorHandling();
         self::_setupDB();
         self::_setupSession();
-        self::_setupUser();
+        self::setupUser();
         self::_callLibs();
         self::_route();
     }
@@ -42,21 +42,21 @@ class EFW {
 
         if (!$driver) { return; }
 
-        self::$db = new PDO(sprintf('%s:host=%s;dbname=%s;charset=%s',
+        self::$pdo = new PDO(sprintf('%s:host=%s;dbname=%s;charset=%s',
                                $driver, $host, $db, $charset),
                             $user,
                             $pass,
                             array(PDO::MYSQL_ATTR_INIT_COMMAND
                               => 'SET NAMES ' . $charset));
 
-        self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
 
     private static function _setupSession() { session_start(); }
 
 
-    private static function _setupUser() {
+    public static function setupUser() {
         if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
             self::$user = array('username' => null,
                                 'role' => 0);
@@ -74,23 +74,25 @@ class EFW {
     private static function _route() {
         try {
             $q = $_GET['q'] . '/'; // i'm a hack!
+
             list($ctrl, $act, $param) = explode('/', $q);
+
             include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
+
+            $ctrl = ucwords($ctrl) . 'Ctrl';
+            $act = $act . 'Act';
+
+            if (isset($ctrl::$auth) && !in_array(self::$user['role'], $ctrl::$auth)){
+                exit('Permission denied.');
+            }
+            
+            if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
+
+            $ctrl::$act($param);
         } catch (Exception $e) {
-            $ctrl = $act = 'default';
-            $param = null;
-            include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
+            include_once __DIR__ . '/../../app/ctrl/default.php';
+            DefaultCtrl::defaultAct(null);
         }
-
-        $ctrl = ucwords($ctrl) . 'Ctrl';
-        $act = $act . 'Act';
-
-        // Check Auth
-        if (isset($ctrl::$auth) && !in_array(self::$user['role'], $ctrl::$auth)){
-            exit('Permission denied.');
-        }
-
-        $ctrl::$act($param);
     }
 }
 
