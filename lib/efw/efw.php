@@ -75,13 +75,12 @@ class EFW {
         try {
             $q = $_GET['q'] . '/'; // i'm a hack!
             list($ctrl, $act, $param) = explode('/', $q);
+            include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
         } catch (Exception $e) {
             $ctrl = $act = 'default';
             $param = null;
+            include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
         }
-
-        // This should be autoloaded
-        require_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
 
         $ctrl = ucwords($ctrl) . 'Ctrl';
         $act = $act . 'Act';
