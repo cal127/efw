@@ -1,6 +1,16 @@
 ---
-debug: Yes
-url  : http://efw
+# Site-wide Settings
+debug  : Yes
+url    : http://efw
+charset: UTF-8
+mods:
+    session: Yes
+    db     : Yes
+    auth   : Yes
+    tpl    : Yes
+    mail   : No
+---
+# Module Settings
 db:
     driver : mysql
     host   : localhost
@@ -9,9 +19,13 @@ db:
     db     : efw
     charset: utf8
     prefix : 
-smtp:
-    host: 
-    port: 
-    user: 
-    pass: 
+mail:
+    host             : 
+    port             : 
+    user             : 
+    pass             : 
+    default_from     : 
+    default_from_name: 
+tpl:
+    auto_escape: Yes
 ...

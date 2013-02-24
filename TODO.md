@@ -2,11 +2,11 @@
   be buggy!!
 - input filtering helper mechanism needed?
 - mod rewrite support!
-- user system is missing!
 - admin panel is missing!
 - routing system is missing!
-- consider autoloading to load controller files
-- dynamic library loading feature is missing!
+- consider autoloading to load controllers and libs
+- i18n & l10n
+- models & orm missing!
 
 elements to be considered on framework design
 =============================================
