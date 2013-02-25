@@ -1,3 +1,4 @@
+- $param binding is not working properly when $param includes /!!!
 - Tpl module: auto_escape for arrays, recursive htmlentities..
 - error handling & logging should be greatly leveraged! currently it may
   be buggy!!
