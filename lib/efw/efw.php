@@ -117,7 +117,10 @@ class EFW {
                 }
             }
             
-            if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
+            if (!is_callable(array($ctrl, $act))) {
+                $act = 'defaultAct';
+                if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
+            }
         } catch (Exception $e) {
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
