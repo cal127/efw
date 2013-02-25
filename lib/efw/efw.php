@@ -98,7 +98,7 @@ class EFW {
 
     private static function _route() {
         try {
-            $q = $_GET['q'] . '/'; // i'm a hack!
+            $q = $_GET['q'] . '//'; // i'm a hack!
 
             list($ctrl, $act, $param) = explode('/', $q);
 
