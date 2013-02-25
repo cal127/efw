@@ -17,7 +17,9 @@ class Tpl {
         }
 
         if (self::$conf['auto_escape']) {
-            $params = array_map(function ($val) {
+            include(__DIR__ . '/../utils.php');  
+
+            $params = array_map_recursive(function ($val) {
                                 return htmlentities($val,
                                                     ENT_QUOTES,
                                                     EFW::$conf['charset']);},
