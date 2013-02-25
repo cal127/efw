@@ -17,12 +17,14 @@ class Auth {
     
     public static function updateUser() {
         if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
-            self::$user = array('username' => null,
+            self::$user = array('id' => null,
+                                'username' => null,
                                 'role' => 0);
             return;
         }
 
-        self::$user = array('username' => $_SESSION['user']['username'],
+        self::$user = array('id' => $_SESSION['user']['username'],
+                            'username' => $_SESSION['user']['username'],
                             'role' => $_SESSION['user']['role']);
     }
 
@@ -31,13 +33,14 @@ class Auth {
 
 
     public static function login($username, $pass) {
-        $sql = 'SELECT `username`, `role` FROM `user` '
+        $sql = 'SELECT `id`, `username`, `role` FROM `user` '
           . 'WHERE `username` = ? AND `pass` = SHA1(?);';
         $stmt = DB::$pdo->prepare($sql);
         $stmt->execute(array($username, $pass));
 
         while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $_SESSION['user'] = array('username' => $user['username'],
+            $_SESSION['user'] = array('id' => $user['id'],
+                                      'username' => $user['username'],
                                       'role'     => $user['role']);
             self::updateUser();
             return true;
