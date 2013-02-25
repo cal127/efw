@@ -29,6 +29,7 @@ class EFW {
         error_reporting(E_ALL);
         set_error_handler(function ($no, $str, $fl, $ln) {
                               throw new ErrorException($str,$no,0,$fl,$ln); });
+        set_exception_handler(function($e) { printf('<pre>%s</pre>', $e); });
     }
 
 
