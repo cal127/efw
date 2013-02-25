@@ -23,7 +23,7 @@ class Auth {
             return;
         }
 
-        self::$user = array('id' => $_SESSION['user']['username'],
+        self::$user = array('id' => $_SESSION['user']['id'],
                             'username' => $_SESSION['user']['username'],
                             'role' => $_SESSION['user']['role']);
     }
