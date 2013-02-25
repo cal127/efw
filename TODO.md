@@ -1,3 +1,4 @@
+- Tpl module: auto_escape for arrays, recursive htmlentities..
 - error handling & logging should be greatly leveraged! currently it may
   be buggy!!
 - input filtering helper mechanism needed?
