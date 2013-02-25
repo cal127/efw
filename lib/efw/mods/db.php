@@ -7,7 +7,7 @@ class DB {
     public static $pdo;
 
 
-    public static function init($conf) {
+    public static function init(&$conf) {
         self::$pdo = new PDO(sprintf('%s:host=%s;dbname=%s;charset=%s',
                                      $conf['driver'],
                                      $conf['host'],

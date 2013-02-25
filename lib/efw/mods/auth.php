@@ -10,7 +10,7 @@ class Auth {
 
 
 
-    public static function init($conf) {
+    public static function init(&$conf) {
         self::updateUser();
     }
 

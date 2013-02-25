@@ -7,7 +7,7 @@ class Tpl {
     public static $conf;
 
 
-    public static function init($conf) {
+    public static function init(&$conf) {
         self::$conf = &$conf;
     }
 
@@ -19,11 +19,11 @@ class Tpl {
         if (self::$conf['auto_escape']) {
             include(__DIR__ . '/../utils.php');  
 
-            $params = array_map_recursive(function ($val) {
-                                return htmlentities($val,
-                                                    ENT_QUOTES,
-                                                    EFW::$conf['charset']);},
-                              $params);
+            $callback = function ($val) {
+                if (is_object($val)) { return $val; }
+                return htmlentities($val, ENT_QUOTES, EFW::$conf['charset']);
+            };
+            $params = array_map_recursive($callback, $params);
         }
 
         extract($params);

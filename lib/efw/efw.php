@@ -85,7 +85,7 @@ class EFW {
 
         // init mod
         try {
-            $mod_cls::init(&self::$mods_conf[$mod]);
+            $mod_cls::init(self::$mods_conf[$mod]);
         } catch (Exception $e) {
             throw new Exception("Error loading module '{$mod}'. " .
               "Message: " . $e->getMessage());

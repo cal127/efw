@@ -5,7 +5,7 @@ namespace EFW;
 class Mail {
     private static $mailer, $default_from, $default_from_name;
 
-    public static function init($conf) {
+    public static function init(&$conf) {
         self::configSmtp($conf['host'],
                          $conf['port'],
                          $conf['user'],
