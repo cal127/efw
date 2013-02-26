@@ -1,14 +1,19 @@
+urgent:
+- new utils module to include small native & 3rd party & libs.
+
+not so urgent:
+- Tpl: auto_escape should also apply to iterable objects (recursively)!
 - $param binding is not working properly when $param includes /!!!
-- Tpl module: auto_escape for arrays, recursive htmlentities..
 - error handling & logging should be greatly leveraged! currently it may
   be buggy!!
-- input filtering helper mechanism needed?
-- mod rewrite support!
-- admin panel is missing!
-- routing system is missing!
+- input filtering helper mechanism needed? Extra module can be added for this.
+- mod rewrite & pretty urls support!
+- admin panel is missing! Extra module?
+- routing system is missing! Extra module?
 - consider autoloading to load controllers and libs
-- i18n & l10n
-- models & orm missing!
+- i18n & l10n. Extra module.
+- models & orm missing! Consider refactoring and adding DBObj as a module.
+- hook for changing the public directory name.
 
 elements to be considered on framework design
 =============================================
