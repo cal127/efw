@@ -113,11 +113,7 @@ class EFW {
     private static function _route() {
         try {
             // parse query string
-            $delimiter_count = substr_count($_GET['q'], '/');
-            if ($delimiter_count < 2) {
-                $_GET['q']= $_GET['q'] . str_repeat('/', 2 - $delimiter_count);
-            }
-            list($ctrl, $act, $extra_params) = explode('/', $_GET['q'], 3);
+            sscanf($_GET['q'], '%[^/]/%[^/]/%s', $ctrl, $act, $extra_params);
 
             // include controller file
             include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
@@ -146,7 +142,6 @@ class EFW {
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
             }
         } catch (Exception $e) {
-            throw $e;
             // fallback to default controller & action
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
