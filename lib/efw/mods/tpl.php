@@ -30,7 +30,7 @@ class Tpl {
         $rarr = array();
         foreach ($arr as $k => $v) {
             $rarr[$k] = is_array($v)
-                ? array_map_recursive($fn, $v)
+                ? call_user_func(__METHOD__, $fn, $v)
                 : $fn($v);
         }
         return $rarr;
