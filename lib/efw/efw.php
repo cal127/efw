@@ -102,15 +102,18 @@ class EFW {
 
     private static function _route() {
         try {
+            // parse query string
             $q = $_GET['q'] . '//'; // i'm a hack!
-
             list($ctrl, $act, $param) = explode('/', $q);
 
+            // include controller file
             include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
 
+            // generate controller class and action method names
             $ctrl = ucwords($ctrl) . 'Ctrl';
             $act = $act . 'Act';
 
+            // check auth
             if (in_array('auth', self::$mods_enabled) && isset($ctrl::$auth)) {
                 if (!is_array($ctrl::$auth)) {
                     $ctrl::$auth = array($ctrl::$auth);
@@ -121,22 +124,26 @@ class EFW {
                 }
             }
             
+            // check presence of controller & action
             if (!is_callable(array($ctrl, $act))) {
                 $act = 'defaultAct';
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
             }
         } catch (Exception $e) {
+            // fallback to default controller & action
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
             $act = 'defaultAct';
             $param = null;
         }
         
+        // set encoding. this can be overridden by the action
         if (self::$conf['charset']) {
             header('Content-type: text/html; charset=' .
               self::$conf['charset']);
         }
 
+        // pass control to relevant action
         $ctrl::$act($param);
     }
 }
