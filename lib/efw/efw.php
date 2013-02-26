@@ -1,7 +1,7 @@
 <?php
 
 namespace EFW;
-use \Exception, \ErrorException;
+use \Exception, \ErrorException, \Spyc;
 
 class EFW {
     public static $conf, $mods_conf;
@@ -10,6 +10,7 @@ class EFW {
 
 
     public static function boot() {
+        self::_loadLibs();
         self::_parseConf();
         self::_setupErrorHandling();
         self::_loadMods();
@@ -17,9 +18,13 @@ class EFW {
     }
 
 
+    private static function _loadLibs() {
+        require_once __DIR__ .  '/../spyc.php'; // YAML
+    }
+
+
     private static function _parseConf() {
-        require_once __DIR__ .  '/../spyc.php';
-        $data = \Spyc::YAMLLoad(__DIR__ . '/../../conf/conf.yml');
+        $data = Spyc::YAMLLoad(__DIR__ . '/../../conf/conf.yml');
         self::$conf = $data['core'];
         self::$mods_conf = $data['mods'];
         self::$mods_enabled = array_keys(array_filter(self::$conf['mods']));
@@ -59,11 +64,9 @@ class EFW {
 
         // load additional settings
         if (file_exists($extra_settings_file)) {
-            require_once __DIR__ .  '/../spyc.php';
-
             self::$mods_conf[$mod] =
               array_merge(self::$mods_conf[$mod],
-                          \Spyc::YAMLLoad($extra_settings_file));
+                          Spyc::YAMLLoad($extra_settings_file));
         }
 
         // get or generate class name
