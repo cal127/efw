@@ -24,7 +24,14 @@ class EFW {
 
 
     private static function _parseConf() {
-        $data = Spyc::YAMLLoad(__DIR__ . '/../../conf/conf.yml');
+        $conf_file = __DIR__ . '/../../conf/conf.yml';
+
+        if (!file_exists($conf_file)) {
+            throw new Exception('"conf.yml" could not be found.');
+        }
+
+        $data = Spyc::YAMLLoad($conf_file);
+
         self::$conf = $data['core'];
         self::$mods_conf = $data['mods'];
         self::$mods_enabled = array_keys(array_filter(self::$conf['mods']));
@@ -106,8 +113,11 @@ class EFW {
     private static function _route() {
         try {
             // parse query string
-            $q = $_GET['q'] . '//'; // i'm a hack!
-            list($ctrl, $act, $param) = explode('/', $q);
+            $delimiter_count = substr_count($_GET['q'], '/');
+            if ($delimiter_count < 2) {
+                $_GET['q']= $_GET['q'] . str_repeat('/', 2 - $delimiter_count);
+            }
+            list($ctrl, $act, $extra_params) = explode('/', $_GET['q'], 3);
 
             // include controller file
             include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
@@ -129,15 +139,19 @@ class EFW {
             
             // check presence of controller & action
             if (!is_callable(array($ctrl, $act))) {
+                // try to redirect to default action method
                 $act = 'defaultAct';
+                $extra_params = null;
+
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
             }
         } catch (Exception $e) {
+            throw $e;
             // fallback to default controller & action
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
             $act = 'defaultAct';
-            $param = null;
+            $extra_params = null;
         }
         
         // set encoding. this can be overridden by the action
@@ -147,7 +161,7 @@ class EFW {
         }
 
         // pass control to relevant action
-        $ctrl::$act($param);
+        $ctrl::$act($extra_params);
     }
 }
 
