@@ -18,8 +18,10 @@ class EFW {
 
 
     private static function _parseConf() {
-        self::$conf = yaml_parse_file(__DIR__ . '/../../conf/conf.yml', 0);
-        self::$mods_conf = yaml_parse_file(__DIR__ . '/../../conf/conf.yml', 1);
+        require_once __DIR__ .  '/../spyc.php';
+        $data = \Spyc::YAMLLoad(__DIR__ . '/../../conf/conf.yml');
+        self::$conf = $data['core'];
+        self::$mods_conf = $data['mods'];
         self::$mods_enabled = array_keys(array_filter(self::$conf['mods']));
     }
 
@@ -57,9 +59,11 @@ class EFW {
 
         // load additional settings
         if (file_exists($extra_settings_file)) {
+            require_once __DIR__ .  '/../spyc.php';
+
             self::$mods_conf[$mod] =
               array_merge(self::$mods_conf[$mod],
-                          yaml_parse_file($extra_settings_file));
+                          \Spyc::YAMLLoad($extra_settings_file));
         }
 
         // get or generate class name
@@ -126,6 +130,11 @@ class EFW {
             $ctrl = 'DefaultCtrl';
             $act = 'defaultAct';
             $param = null;
+        }
+        
+        if (self::$conf['charset']) {
+            header('Content-type: text/html; charset=' .
+              self::$conf['charset']);
         }
 
         $ctrl::$act($param);

@@ -21,6 +21,7 @@ class DefaultCtrl {
 
         $vars['is_logged'] = Auth::isLogged();
         $vars['username'] = Auth::$user['username'];
+        $vars['url'] = EFW::$conf['url'];
 
         Tpl::render('default', $vars);
     }
