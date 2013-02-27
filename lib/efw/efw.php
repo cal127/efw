@@ -14,12 +14,14 @@ class EFW {
         self::_parseConf();
         self::_setupErrorHandling();
         self::_loadMods();
+        self::_other();
         self::_route();
     }
 
 
     private static function _loadLibs() {
         require_once __DIR__ .  '/../spyc.php'; // YAML
+        require_once __DIR__ .  '/utils.php';
     }
 
 
@@ -107,6 +109,11 @@ class EFW {
 
         // add to loaded mods array
         self::$mods_loaded[] = $mod;
+    }
+
+
+    private static function _other() {
+        undo_magic_quotes();
     }
 
 
