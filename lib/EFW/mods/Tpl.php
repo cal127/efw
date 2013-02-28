@@ -21,8 +21,10 @@ class Tpl {
         require __DIR__ . '/../../Mustache/Autoloader.php';
         \Mustache_Autoloader::register();
         self::$engine = new \Mustache_Engine(array(
-            'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ . 
+            'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
               '/../../../app/view'),
+            'partials_loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
+              '/../../../app/view')
         ));
     }
 
