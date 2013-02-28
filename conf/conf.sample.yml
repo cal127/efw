@@ -2,30 +2,32 @@
 # Site-wide Settings
 core:
     debug  : Yes
-    url    : http://site.com
+    url    : http://efw
     charset: UTF-8
     mods:
-        session: Yes
-        db     : Yes
-        auth   : Yes
-        tpl    : Yes
-        mail   : No
+        Session: Yes
+        DB     : Yes
+        Auth   : Yes
+        Tpl    : Yes
+        Mail   : No
 mods:
-    db:
-        driver : 
-        host   : 
-        user   : 
-        pass   : 
-        db     : 
-        charset: 
+    DB:
+        driver : mysql
+        host   : localhost
+        user   : root
+        pass   : root
+        db     : efw
+        charset: utf8
         prefix : 
-    mail:
+    Mail:
         host             : 
         port             : 
         user             : 
         pass             : 
         default_from     : 
         default_from_name: 
-    tpl:
-        auto_escape: Yes
+    Tpl:
+        engine: native
+        options:
+            auto_escape: Yes
 ...

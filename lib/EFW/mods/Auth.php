@@ -4,8 +4,8 @@ namespace EFW;
 use \PDO;
 
 class Auth {
-    public static $dependencies = array('session',
-                                        'db');
+    public static $dependencies = array('Session',
+                                        'DB');
     public static $user;
 
 

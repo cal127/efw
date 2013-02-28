@@ -71,19 +71,16 @@ class EFW {
               "Message: " . $e->getMessage());
         }
 
+        // extra settings are not being used by any module currently,
+        // so i'm considering removing them.
         // load additional settings
-        if (file_exists($extra_settings_file)) {
-            self::$mods_conf[$mod] =
-              array_merge(self::$mods_conf[$mod],
-                          Spyc::YAMLLoad($extra_settings_file));
-        }
+        // if (file_exists($extra_settings_file)) {
+        //     self::$mods_conf[$mod] =
+        //       array_merge(self::$mods_conf[$mod],
+        //                   Spyc::YAMLLoad($extra_settings_file));
+        // }
 
-        // get or generate class name
-        $mod_cls = isset(self::$mods_conf[$mod]['class_name'])
-                            ? self::$mods_conf[$mod]['class_name']
-                            : ucwords($mod);
-
-        $mod_cls = __NAMESPACE__ . '\\' . $mod_cls;
+        $mod_cls = __NAMESPACE__ . '\\' . $mod;
 
         // load dependencies
         if (isset($mod_cls::$dependencies)) {

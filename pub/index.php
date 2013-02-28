@@ -1,4 +1,6 @@
 <?php
-require_once '../lib/efw/efw.php';
+
+require_once '../lib/EFW/EFW.php';
 EFW\EFW::boot();
+
 ?>
