@@ -31,7 +31,7 @@ function _url($qs) {
     $u = EFW::$conf['url'];
     $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
 
-    if (!preg_match('/^.*\.(?:css|js|png|jpg|jpeg|gif)$/', $qs) || $p) {
+    if (preg_match('/^.*\.(?:css|js|png|jpg|jpeg|gif)$/', $qs) || $p) {
         return $u . '/' . $qs;
     }
 
