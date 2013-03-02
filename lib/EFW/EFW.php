@@ -6,6 +6,7 @@ use \Exception, \ErrorException, \Spyc;
 class EFW {
     public static $conf, $mods_conf;
     public static $mods_enabled = array(), $mods_loaded = array();
+    private static $no_auth_callable;
 
 
 
@@ -15,7 +16,34 @@ class EFW {
         self::_setupErrorHandling();
         self::_loadMods();
         self::_other();
+        self::_userConfig();
         self::_route();
+    }
+
+
+    public static function registerNoAuthFunc($callable) {
+        if (!is_callable($callable)) {
+            throw new Exception('First parameter must be a callable.'); }
+
+        // test whether it's a method or function/closure
+        if (is_array($callable)
+          || (is_string($callable) && strpos($callable, '::') !== false)) {
+            if (is_string($callable)) { $callable = explode('::', $callable); }
+            $rfa = new \ReflectionMethod($callable[0], $callable[1]);
+        } else {
+            $rfa = new \ReflectionFunction($callable);
+        }
+
+        if ($rfa->getNumberOfParameters() != 2) {
+            throw new Exception('The callable must have two arguments.');
+        }
+
+        self::$no_auth_callable = $callable;
+    }
+
+
+    private static function defaultNoAuthFunc($permitted_roles, $user_role) {
+        exit('Permission denied.');
     }
 
 
@@ -110,12 +138,20 @@ class EFW {
 
 
     private static function _other() {
-        undo_magic_quotes();
+        self::registerNoAuthFunc(array(__CLASS__, 'defaultNoAuthFunc'));
+    }
+
+
+    private static function _userConfig() {
+        $conf_file = __DIR__ . '/../../conf/conf.php';
+        if (is_file($conf_file)) { require_sandbox($conf_file); }
     }
 
 
     private static function _route() {
         try {
+            undo_magic_quotes();
+
             // parse query string
             sscanf($_GET['q'], '%[^/]/%[^/]/%s', $ctrl, $act, $extra_params);
 
@@ -127,13 +163,13 @@ class EFW {
             $act = $act . 'Act';
 
             // check auth
-            if (in_array('auth', self::$mods_enabled) && isset($ctrl::$auth)) {
+            if (in_array('Auth', self::$mods_enabled) && isset($ctrl::$auth)) {
                 if (!is_array($ctrl::$auth)) {
                     $ctrl::$auth = array($ctrl::$auth);
                 }
 
                 if (!in_array(Auth::$user['role'], $ctrl::$auth)){
-                    exit('Permission denied.');
+                    call_user_func(self::$no_auth_callable, $ctrl::$auth, Auth::$user['role']);
                 }
             }
             
@@ -146,6 +182,7 @@ class EFW {
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
             }
         } catch (Exception $e) {
+            throw $e;
             // fallback to default controller & action
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';

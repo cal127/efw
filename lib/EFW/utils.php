@@ -20,4 +20,9 @@ function undo_magic_quotes() {
     }
 }
 
+function require_sandbox($filename) {
+    $f = function() use ($filename) { require $filename; };
+    $f();
+}
+
 ?>
