@@ -13,6 +13,7 @@ not so urgent:
 - routing system is missing! Extra module?
 - consider autoloading to load controllers and libs
 - i18n & l10n. Extra module.
+    - mustache -> i18n?
 - hook for changing the public directory name.
 
 elements to be considered on framework design
