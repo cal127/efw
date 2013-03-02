@@ -182,7 +182,6 @@ class EFW {
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
             }
         } catch (Exception $e) {
-            throw $e;
             // fallback to default controller & action
             include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
