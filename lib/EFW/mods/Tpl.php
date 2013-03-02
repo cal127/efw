@@ -9,6 +9,7 @@ class Tpl {
 
 
     public static function init(&$conf) {
+        self::$conf = $conf;
         $callback = 'init' . strtoupper($conf['engine']);
         self::$callback();
     }
@@ -20,11 +21,12 @@ class Tpl {
     public static function initMustache() {
         require __DIR__ . '/../../Mustache/Autoloader.php';
         \Mustache_Autoloader::register();
+
         self::$engine = new \Mustache_Engine(array(
             'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
               '/../../../app/view'),
             'partials_loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
-              '/../../../app/view')
+              '/../../../app/view/' . self::$conf['options']['partials_path'])
         ));
     }
 
