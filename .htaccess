@@ -1,0 +1,13 @@
+# mod_rewrite
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+RewriteBase /
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^/(.*\.(?:js|css|png|jpg|jpeg|gif))$ - [L]
+RewriteRule ^/(.*)$ /index.php?q=$1 [L]
+
+# RewriteLog "/home/cal/projects/gelirgider_demo/logs/rewrite.log"
+# RewriteLogLevel 3
+</IfModule>
