@@ -34,15 +34,17 @@ class EFW {
             $rfa = new \ReflectionFunction($callable);
         }
 
-        if ($rfa->getNumberOfParameters() != 2) {
-            throw new Exception('The callable must have two arguments.');
+        if ($rfa->getNumberOfParameters() != 3) {
+            throw new Exception('The callable must have three arguments.');
         }
 
         self::$no_auth_callable = $callable;
     }
 
 
-    private static function defaultNoAuthFunc($permitted_roles, $user_role) {
+    private static function defaultNoAuthFunc($permitted_roles,
+                                              $user_role,
+                                              $query_string) {
         exit('Permission denied.');
     }
 
@@ -162,17 +164,6 @@ class EFW {
             $ctrl = ucwords($ctrl) . 'Ctrl';
             $act = $act . 'Act';
 
-            // check auth
-            if (in_array('Auth', self::$mods_enabled) && isset($ctrl::$auth)) {
-                if (!is_array($ctrl::$auth)) {
-                    $ctrl::$auth = array($ctrl::$auth);
-                }
-
-                if (!in_array(Auth::$user['role'], $ctrl::$auth)){
-                    call_user_func(self::$no_auth_callable, $ctrl::$auth, Auth::$user['role']);
-                }
-            }
-            
             // check presence of controller & action
             if (!is_callable(array($ctrl, $act))) {
                 // try to redirect to default action method
@@ -180,6 +171,20 @@ class EFW {
                 $extra_params = null;
 
                 if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
+            }
+            
+            // check auth
+            if (in_array('Auth', self::$mods_enabled) && isset($ctrl::$auth)) {
+                if (!is_array($ctrl::$auth)) {
+                    $ctrl::$auth = array($ctrl::$auth);
+                }
+
+                if (!in_array(Auth::$user['role'], $ctrl::$auth)){
+                    call_user_func(self::$no_auth_callable,
+                                   $ctrl::$auth,
+                                   Auth::$user['role'],
+                                   $_GET['q']);
+                }
             }
         } catch (Exception $e) {
             // fallback to default controller & action
