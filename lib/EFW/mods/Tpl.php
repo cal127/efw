@@ -14,9 +14,7 @@ class Tpl {
         self::$callback();
     }
 
-    public static function initNative() {
-        self::$engine = new NativeTpl();
-    }
+    public static function initNative() { self::$engine = new NativeTpl(); }
 
     public static function initMustache() {
         require __DIR__ . '/../../Mustache/Autoloader.php';
@@ -28,10 +26,8 @@ class Tpl {
             'partials_loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
               '/../../../app/view/' . self::$conf['options']['partials_path']),
             'helpers' => array(
-                '_url' => function($qs) {
-                    $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
-                    $u = EFW::$conf['url'];
-                    return $p ? "{$u}/{$qs}" : "{$u}/index.php?q={$qs}";
+                '_url' => function($qs, \Mustache_LambdaHelper $h) {
+                    return _url($h->render($qs)); 
                 }
             )
         ));
