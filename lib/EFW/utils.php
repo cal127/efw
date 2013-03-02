@@ -28,9 +28,14 @@ function require_sandbox($filename) {
 }
 
 function _url($qs) {
-    $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
     $u = EFW::$conf['url'];
-    return $p ? "{$u}/{$qs}" : "{$u}/index.php?q={$qs}";
+    $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
+
+    if (!preg_match('/^.*\.(?:css|js|png|jpg|jpeg|gif)$/', $qs) || !$p) {
+        return $u . '/' . $qs;
+    }
+
+    return $u . '/index.php?q=' . $qs;
 };
 
 ?>
