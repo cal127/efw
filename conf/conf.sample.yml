@@ -27,7 +27,8 @@ mods:
         default_from     : 
         default_from_name: 
     Tpl:
-        engine: native
+        engine: mustache
         options:
-            auto_escape: Yes
+            pretty_urls: No
+            partials_path: part
 ...

@@ -26,7 +26,14 @@ class Tpl {
             'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
               '/../../../app/view'),
             'partials_loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
-              '/../../../app/view/' . self::$conf['options']['partials_path'])
+              '/../../../app/view/' . self::$conf['options']['partials_path']),
+            'helpers' => array(
+                '_url' => function($qs) {
+                    $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
+                    $u = EFW::$conf['url'];
+                    return $p ? "{$u}/{$qs}" : "{$u}/index.php?q={$qs}";
+                }
+            )
         ));
     }
 
