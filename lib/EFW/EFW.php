@@ -152,10 +152,21 @@ class EFW {
 
     private static function _route() {
         try {
+            // what the hell?
+            $decoded = urldecode($_SERVER['REQUEST_URI']);
+            $inter = array_intersect(explode('/', $decoded),
+                                     explode('/', self::$conf['url']));
+            $params = ltrim(substr($decoded, strlen(implode('/', $inter))), '/');
+
+            // self-explanatory
             undo_magic_quotes();
 
             // parse query string
-            sscanf($_GET['q'], '%[^/]/%[^/]/%s', $ctrl, $act, $extra_params);
+            sscanf($params,
+                   '%[^/]/%[^/]/%s',
+                   $ctrl,
+                   $act,
+                   $extra_params);
 
             // include controller file
             include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
