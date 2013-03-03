@@ -194,7 +194,7 @@ class EFW {
                     call_user_func(self::$no_auth_callable,
                                    $ctrl::$auth,
                                    Auth::$user['role'],
-                                   $_GET['q']);
+                                   $params);
                 }
             }
         } catch (Exception $e) {
