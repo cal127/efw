@@ -1,4 +1,7 @@
 not so urgent:
+- mod_rewrite + _url() function rules. correct
+- mod_rewrite leverage & bulletproof & test
+- hook to configure mustache template and partial file paths
 - integrate a templating engine (mustache, twig)
 - integrate an ORM(doctrine, redbean, paris) or a fluent query builder (fluent pdo, fluent query builder, idiorm)
     - Consider refactoring and adding DBObj as a module.
