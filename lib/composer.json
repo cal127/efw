@@ -1,0 +1,7 @@
+{
+    "require": {
+        "lespoilus/spyc": "master-dev",
+        "mustache/mustache": "2.1.*",
+        "j4mie/paris": "1.3.*"
+    }
+}

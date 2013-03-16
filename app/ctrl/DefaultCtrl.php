@@ -1,6 +1,6 @@
 <?php
 
-use EFW\EFW, EFW\Auth, EFW\Tpl;
+use EFW\EFW, EFW\Auth, EFW\Tpl, EFW\DB;
 
 class DefaultCtrl {
     public static function defaultAct($param) {
@@ -23,7 +23,7 @@ class DefaultCtrl {
         $vars['username'] = Auth::$user['username'];
         $vars['url'] = EFW::$conf['url'];
 
-        Tpl::render('default', $vars);
+        echo Tpl::render('default', $vars);
     }
 }
 

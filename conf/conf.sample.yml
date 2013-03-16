@@ -4,6 +4,7 @@ core:
     debug  : Yes
     url    : http://efw
     charset: UTF-8
+    pretty_urls: No
     mods:
         Session: Yes
         DB     : Yes
@@ -19,6 +20,11 @@ mods:
         db     : efw
         charset: utf8
         prefix : 
+        ORM    :
+        options:
+    Tpl:
+        engine: native
+        options:
     Mail:
         host             : 
         port             : 
@@ -26,9 +32,4 @@ mods:
         pass             : 
         default_from     : 
         default_from_name: 
-    Tpl:
-        engine: mustache
-        options:
-            pretty_urls: No
-            partials_path: part
 ...

@@ -50,8 +50,8 @@ class EFW {
 
 
     private static function _loadLibs() {
-        require_once __DIR__ .  '/../spyc.php'; // YAML
         require_once __DIR__ .  '/utils.php';
+        require_once __DIR__ . '/../vendor/autoload.php'; // composer
     }
 
 
@@ -101,14 +101,6 @@ class EFW {
               "Message: " . $e->getMessage());
         }
 
-        // extra settings are not being used by any module currently,
-        // so i'm considering removing them.
-        // load additional settings
-        // if (file_exists($extra_settings_file)) {
-        //     self::$mods_conf[$mod] =
-        //       array_merge(self::$mods_conf[$mod],
-        //                   Spyc::YAMLLoad($extra_settings_file));
-        // }
 
         $mod_cls = __NAMESPACE__ . '\\' . $mod;
 
@@ -140,6 +132,7 @@ class EFW {
 
 
     private static function _other() {
+        spl_autoload_register('autoload');
         self::registerNoAuthFunc(array(__CLASS__, 'defaultNoAuthFunc'));
     }
 
@@ -152,14 +145,19 @@ class EFW {
 
     private static function _route() {
         try {
-            // what the hell?
-            $decoded = urldecode($_SERVER['REQUEST_URI']);
-            $inter = array_intersect(explode('/', $decoded),
-                                     explode('/', self::$conf['url']));
-            $params = ltrim(substr($decoded, strlen(implode('/', $inter))), '/');
-
             // self-explanatory
             undo_magic_quotes();
+
+            // what the hell?
+            if (self::$conf['pretty_urls']) {
+                $decoded = urldecode($_SERVER['REQUEST_URI']);
+                $inter = array_intersect(explode('/', $decoded),
+                                         explode('/', self::$conf['url']));
+                $params = ltrim(substr($decoded, strlen(implode('/', $inter))),
+                                '/');
+            } else {
+                $params = $_GET['q'];
+            }
 
             // parse query string
             sscanf($params,
@@ -168,20 +166,18 @@ class EFW {
                    $act,
                    $extra_params);
 
-            // include controller file
-            include_once __DIR__ . '/../../app/ctrl/' . $ctrl . '.php';
-
             // generate controller class and action method names
             $ctrl = ucwords($ctrl) . 'Ctrl';
             $act = $act . 'Act';
 
             // check presence of controller & action
-            if (!is_callable(array($ctrl, $act))) {
-                // try to redirect to default action method
+            if (!class_exists($ctrl, true)) { throw new Exception(); }
+
+            if (!method_exists($ctrl, $act)) {
                 $act = 'defaultAct';
                 $extra_params = null;
 
-                if (!is_callable(array($ctrl, $act))) { throw new Exception(); }
+                if (!method_exists($ctrl, $act)) { throw new Exception(); }
             }
             
             // check auth
@@ -199,7 +195,6 @@ class EFW {
             }
         } catch (Exception $e) {
             // fallback to default controller & action
-            include_once __DIR__ . '/../../app/ctrl/default.php';
             $ctrl = 'DefaultCtrl';
             $act = 'defaultAct';
             $extra_params = null;

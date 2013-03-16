@@ -29,7 +29,7 @@ function require_sandbox($filename) {
 
 function _url($qs) {
     $u = EFW::$conf['url'];
-    $p = EFW::$mods_conf['Tpl']['options']['pretty_urls'];
+    $p = EFW::$conf['pretty_urls'];
 
     if (preg_match('/^.*\.(?:css|js|png|jpg|jpeg|gif)$/', $qs) || $p) {
         return $u . '/' . $qs;
@@ -37,5 +37,18 @@ function _url($qs) {
 
     return $u . '/index.php?q=' . $qs;
 };
+
+function autoload($class_name) {
+    $ctrl_dir = __DIR__ . '/../../app/ctrl';
+    $model_dir = __DIR__ . '/../../app/model';
+
+    $file_name = $class_name . '.php';
+
+    try {
+        include_once $ctrl_dir . '/' . $file_name;
+    } catch (Exception $e) {
+        require_once $model_dir . '/' . $file_name;
+    }
+}
 
 ?>
