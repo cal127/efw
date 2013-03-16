@@ -47,7 +47,7 @@ function autoload($class_name) {
     try {
         include_once $ctrl_dir . '/' . $file_name;
     } catch (Exception $e) {
-        require_once $model_dir . '/' . $file_name;
+        include_once $model_dir . '/' . $file_name;
     }
 }
 

@@ -16,7 +16,7 @@ class Mail {
     }
     
     public static function configSmtp($host, $port, $username, $pass) {
-        self::$mailer = new PHPMailer();
+        self::$mailer = new \PHPMailer();
         self::$mailer->IsSMTP();
         self::$mailer->Host = $host;
         self::$mailer->Port = $port;
