@@ -3,59 +3,42 @@
 namespace EFW;
 use \Exception, \ErrorException, \Spyc;
 
-class EFW {
+class EFW
+{
     public static $conf, $mods_conf;
     public static $mods_enabled = array(), $mods_loaded = array();
-    private static $no_auth_callable;
+    private static $ctrl, $act, $params;
 
 
 
-    public static function boot() {
-        self::_loadLibs();
-        self::_parseConf();
-        self::_setupErrorHandling();
-        self::_loadMods();
-        self::_other();
-        self::_userConfig();
-        self::_route();
+    public static function getCtrl() { return self::$ctrl; }
+    public static function getAct() { return self::$act; }
+    public static function getParams() { return self::$params; }
+
+
+    public static function boot()
+    {
+        self::loadLibs();
+        self::parseConf();
+        self::setupErrorHandling();
+        self::registerAutoloaders();
+        self::parseQS();
+        self::loadMods();
+        self::userConfig();
+        self::setDefaultHeaders();
+        self::route();
     }
 
 
-    public static function registerNoAuthFunc($callable) {
-        if (!is_callable($callable)) {
-            throw new Exception('First parameter must be a callable.'); }
-
-        // test whether it's a method or function/closure
-        if (is_array($callable)
-          || (is_string($callable) && strpos($callable, '::') !== false)) {
-            if (is_string($callable)) { $callable = explode('::', $callable); }
-            $rfa = new \ReflectionMethod($callable[0], $callable[1]);
-        } else {
-            $rfa = new \ReflectionFunction($callable);
-        }
-
-        if ($rfa->getNumberOfParameters() != 3) {
-            throw new Exception('The callable must have three arguments.');
-        }
-
-        self::$no_auth_callable = $callable;
-    }
-
-
-    private static function defaultNoAuthFunc($permitted_roles,
-                                              $user_role,
-                                              $query_string) {
-        exit('Permission denied.');
-    }
-
-
-    private static function _loadLibs() {
+    private static function loadLibs()
+    {
         require_once __DIR__ .  '/utils.php';
         require_once __DIR__ . '/../vendor/autoload.php'; // composer
     }
 
 
-    private static function _parseConf() {
+    private static function parseConf()
+    {
         $conf_file = __DIR__ . '/../../conf/conf.yml';
 
         if (!file_exists($conf_file)) {
@@ -70,39 +53,110 @@ class EFW {
     }
 
 
-    private static function _setupErrorHandling() {
+    private static function setupErrorHandling()
+    {
         ini_set('display_errors', self::$conf['debug']);
         error_reporting(E_ALL);
         set_error_handler(function ($no, $str, $fl, $ln) {
                               throw new ErrorException($str,$no,0,$fl,$ln); });
         set_exception_handler(function($e) { printf('<pre>%s</pre>', $e); });
     }
+    
+
+    private static function registerAutoloaders()
+    {
+        // Autoloader for mods
+        spl_autoload_register(function($class_name)
+        {
+            $class_name = ltrim($class_name, '\\');
+
+            if (strpos($class_name, __NAMESPACE__ . '\\') !== 0) {
+                return;
+            }
+
+            $mod_name = substr($class_name, strlen(__NAMESPACE__) + 1);
+            $file_name = __DIR__ . '/mods/' . $mod_name . '.php';
+
+            try {
+                include_once $file_name;
+            } catch (Exception $e) { }
+        });
+        
+        // Autoloader for models and controllers
+        spl_autoload_register(function($class_name)
+        {
+            $model_dir = __DIR__ . '/../../app/model';
+            $ctrl_dir = __DIR__ . '/../../app/ctrl';
+
+            $file_name = $class_name . '.php';
+
+            try {
+                include_once $model_dir . '/' . $file_name;
+            } catch (Exception $e) {
+                try {
+                    include_once $ctrl_dir . '/' . $file_name;
+                } catch (Exception $e) { }
+            }
+        });
+    }
 
 
-    private static function _loadMods() {
+    private static function parseQS()
+    {
+        self::undo_magic_quotes();
+
+        // get query string
+        if (self::$conf['pretty_urls']) {
+            $decoded = urldecode($_SERVER['REQUEST_URI']);
+            $inter = array_intersect(explode('/', $decoded),
+                                     explode('/', self::$conf['url']));
+            $qs = ltrim(substr($decoded, strlen(implode('/', $inter))),
+                            '/');
+        } else {
+            $qs = !empty($_GET['q']) ? $_GET['q'] : '';
+        }
+
+        // parse query string
+        list($ctrl, $act, $params) = sscanf($qs, '%[^/]/%[^/]/%s');
+
+        // check presence of controller & action
+        if (!method_exists(ucfirst($ctrl) . 'Ctrl', $act . 'Act')) {
+            // Try to redirect to the default action of the ctrl in question
+            $act = 'default';
+            $params = '';
+
+            if (!method_exists(ucfirst($ctrl) . 'Ctrl', $act . 'Act')) {
+                $ctrl = 'default';
+            }
+        }
+
+        // save
+        self::$ctrl = $ctrl;
+        self::$act = $act;
+        self::$params = $params;
+    }
+
+
+    private static function loadMods()
+    {
         foreach (self::$mods_enabled as $mod) {
             // It's checked if the module is loaded because it could already
             // be loaded by a dependency loading statement
-            if (!in_array($mod, self::$mods_loaded)) { self::_loadMod($mod); }
+            if (!in_array($mod, self::$mods_loaded)) { self::loadMod($mod); }
         }
     }
 
 
-    private static function _loadMod($mod) {
-        $prefix = __DIR__ . '/mods/' . $mod;
-        $mod_file = $prefix . '.php';
-        $extra_settings_file = $prefix . '.yml';
-
-        // include module file
-        try {
-            include_once $mod_file;
-        } catch (Exception $e) {
-            throw new Exception("Error loading module '{$mod}'. " .
-              "Message: " . $e->getMessage());
-        }
-
-
+    private static function loadMod($mod)
+    {
+        // generate mod class name
         $mod_cls = __NAMESPACE__ . '\\' . $mod;
+
+        // check for presence of module
+        if (!class_exists($mod_cls, true)) {
+            throw new Exception("Module '{$mod}' could not be found. " .
+              'Message: ' . $e->getMessage());
+        }
 
         // load dependencies
         if (isset($mod_cls::$dependencies)) {
@@ -122,8 +176,8 @@ class EFW {
         try {
             $mod_cls::init(self::$mods_conf[$mod]);
         } catch (Exception $e) {
-            throw new Exception("Error loading module '{$mod}'. " .
-              "Message: " . $e->getMessage());
+            throw new Exception("Error initializing module '{$mod}'. " .
+              'Message: ' . $e->getMessage());
         }
 
         // add to loaded mods array
@@ -131,84 +185,76 @@ class EFW {
     }
 
 
-    private static function _other() {
-        spl_autoload_register('autoload');
-        self::registerNoAuthFunc(array(__CLASS__, 'defaultNoAuthFunc'));
-    }
-
-
-    private static function _userConfig() {
+    private static function userConfig()
+    {
         $conf_file = __DIR__ . '/../../conf/conf.php';
-        if (is_file($conf_file)) { require_sandbox($conf_file); }
+        if (is_file($conf_file)) { self::require_sandbox($conf_file); }
     }
 
 
-    private static function _route() {
-        try {
-            // self-explanatory
-            undo_magic_quotes();
-
-            // what the hell?
-            if (self::$conf['pretty_urls']) {
-                $decoded = urldecode($_SERVER['REQUEST_URI']);
-                $inter = array_intersect(explode('/', $decoded),
-                                         explode('/', self::$conf['url']));
-                $params = ltrim(substr($decoded, strlen(implode('/', $inter))),
-                                '/');
-            } else {
-                $params = $_GET['q'];
-            }
-
-            // parse query string
-            sscanf($params,
-                   '%[^/]/%[^/]/%s',
-                   $ctrl,
-                   $act,
-                   $extra_params);
-
-            // generate controller class and action method names
-            $ctrl = ucwords($ctrl) . 'Ctrl';
-            $act = $act . 'Act';
-
-            // check presence of controller & action
-            if (!class_exists($ctrl, true)) { throw new Exception(); }
-
-            if (!method_exists($ctrl, $act)) {
-                $act = 'defaultAct';
-                $extra_params = null;
-
-                if (!method_exists($ctrl, $act)) { throw new Exception(); }
-            }
-            
-            // check auth
-            if (in_array('Auth', self::$mods_enabled) && isset($ctrl::$auth)) {
-                if (!is_array($ctrl::$auth)) {
-                    $ctrl::$auth = array($ctrl::$auth);
-                }
-
-                if (!in_array(Auth::$user['role'], $ctrl::$auth)){
-                    call_user_func(self::$no_auth_callable,
-                                   $ctrl::$auth,
-                                   Auth::$user['role'],
-                                   $params);
-                }
-            }
-        } catch (Exception $e) {
-            // fallback to default controller & action
-            $ctrl = 'DefaultCtrl';
-            $act = 'defaultAct';
-            $extra_params = null;
-        }
-        
-        // set encoding. this can be overridden by the action
+    private static function setDefaultHeaders() {
+        // encoding
         if (self::$conf['charset']) {
             header('Content-type: text/html; charset=' .
               self::$conf['charset']);
         }
-
-        // pass control to relevant action
-        $ctrl::$act($extra_params);
     }
+
+
+    private static function route()
+    {
+        // generate ctrl and act names
+        $ctrl_name = ucfirst(self::$ctrl) . 'Ctrl';
+        $act_name = self::$act . 'Act';
+
+        // check auth if enabled
+        if (in_array('Auth', self::$mods_enabled) && isset($ctrl_name::$auth)) {
+            if (!is_array($ctrl_name::$auth)) {
+                $ctrl_name::$auth = array($ctrl_name::$auth);
+            }
+
+            if (!in_array(Auth::getUserRole(), $ctrl_name::$auth)){
+                Auth::callAuthErrorCallback($ctrl_name::$auth,
+                                            Auth::$user['role'],
+                                            self::$ctrl,
+                                            self::$act,
+                                            self::$params);
+            }
+        }
+        
+        // pass control to relevant action
+        $ctrl_name::$act_name(self::$params);
+    }
+
+    
+    // utils //////////////////////////////////////////////////////////////////
+    private static function undo_magic_quotes()
+    {
+        if (get_magic_quotes_gpc()) {
+            $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
+
+            while (list($key, $val) = each($process)) {
+                foreach ($val as $k => $v) {
+                    unset($process[$key][$k]);
+                    if (is_array($v)) {
+                        $process[$key][stripslashes($k)] = $v;
+                        $process[] = &$process[$key][stripslashes($k)];
+                    } else {
+                        $process[$key][stripslashes($k)] = stripslashes($v);
+                    }
+                }
+            }
+
+            unset($process);
+        }
+    }
+
+    private static function require_sandbox($filename)
+    {
+        $f = function() use ($filename) { require $filename; };
+        $f();
+    }
+    // /utils //////////////////////////////////////////////////////////////////
 }
 
 ?>
