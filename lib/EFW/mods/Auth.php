@@ -71,8 +71,7 @@ class Auth {
                                                  $ctrl,
                                                  $act,
                                                  $params) {
-        self::$auth_error_callback($permitted_roles, $user_role,
-                                   $ctrl, $act, $params);
+        call_user_func_array(self::$auth_error_callback, func_get_args());
     }
 
 

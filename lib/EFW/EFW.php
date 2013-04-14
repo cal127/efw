@@ -18,10 +18,9 @@ class EFW
 
     public static function boot()
     {
-        self::loadLibs();
+        self::setupLibsAndAutoloaders();
         self::parseConf();
         self::setupErrorHandling();
-        self::registerAutoloaders();
         self::parseQS();
         self::loadMods();
         self::userConfig();
@@ -30,41 +29,26 @@ class EFW
     }
 
 
-    private static function loadLibs()
+    private static function setupLibsAndAutoloaders()
     {
+        // Import util functions for EFW
         require_once __DIR__ .  '/utils.php';
+
+        // Autoloader for composer
         require_once __DIR__ . '/../vendor/autoload.php'; // composer
-    }
 
+        // Autoloader for local libs
+        spl_autoload_register(function($class_name)
+        {
+            $lib_dir = __DIR__ . '/..';
 
-    private static function parseConf()
-    {
-        $conf_file = __DIR__ . '/../../conf/conf.yml';
+            $file = $lib_dir . '/' . $class_name . '.php';
 
-        if (!file_exists($conf_file)) {
-            throw new Exception('"conf.yml" could not be found.');
-        }
+            try {
+                include_once $file;
+            } catch (Exception $e) { }
+        });
 
-        $data = Spyc::YAMLLoad($conf_file);
-
-        self::$conf = $data['core'];
-        self::$mods_conf = $data['mods'];
-        self::$mods_enabled = array_keys(array_filter(self::$conf['mods']));
-    }
-
-
-    private static function setupErrorHandling()
-    {
-        ini_set('display_errors', self::$conf['debug']);
-        error_reporting(E_ALL);
-        set_error_handler(function ($no, $str, $fl, $ln) {
-                              throw new ErrorException($str,$no,0,$fl,$ln); });
-        set_exception_handler(function($e) { printf('<pre>%s</pre>', $e); });
-    }
-    
-
-    private static function registerAutoloaders()
-    {
         // Autoloader for mods
         spl_autoload_register(function($class_name)
         {
@@ -100,6 +84,32 @@ class EFW
         });
     }
 
+
+    private static function parseConf()
+    {
+        $conf_file = __DIR__ . '/../../conf/conf.yml';
+
+        if (!file_exists($conf_file)) {
+            throw new Exception('"conf.yml" could not be found.');
+        }
+
+        $data = Spyc::YAMLLoad($conf_file);
+
+        self::$conf = $data['core'];
+        self::$mods_conf = $data['mods'];
+        self::$mods_enabled = array_keys(array_filter(self::$conf['mods']));
+    }
+
+
+    private static function setupErrorHandling()
+    {
+        ini_set('display_errors', self::$conf['debug']);
+        error_reporting(E_ALL);
+        set_error_handler(function ($no, $str, $fl, $ln) {
+                              throw new ErrorException($str,$no,0,$fl,$ln); });
+        set_exception_handler(function($e) { printf('<pre>%s</pre>', $e); });
+    }
+    
 
     private static function parseQS()
     {
@@ -215,7 +225,7 @@ class EFW
 
             if (!in_array(Auth::getUserRole(), $ctrl_name::$auth)){
                 Auth::callAuthErrorCallback($ctrl_name::$auth,
-                                            Auth::$user['role'],
+                                            Auth::getUserRole(),
                                             self::$ctrl,
                                             self::$act,
                                             self::$params);
