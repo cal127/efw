@@ -1,1 +1,4 @@
 /conf/conf.yml
+/lib/composer.json
+/lib/composer.lock
+/lib/vendor
