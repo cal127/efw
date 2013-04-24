@@ -1,7 +1,11 @@
 <?php
 
 namespace EFW;
-use \Exception, \ErrorException, \Spyc;
+
+use \Exception;
+use \ErrorException
+use \Spyc;
+
 
 class EFW
 {
