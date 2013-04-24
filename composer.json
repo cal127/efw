@@ -1,0 +1,9 @@
+{
+    "require": {
+        "lespoilus/spyc": "master-dev"
+    },
+    "autoload": {
+        "psr-0": {"EFW": "src/"},
+        "files": ["src/utils.php"]
+    }
+}
