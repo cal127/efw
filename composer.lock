@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "34e063c5d8a9fc2770626a6269cf4335",
+    "hash": "4e09e7b5635610f301af15de6ca5d513",
     "packages": [
         {
             "name": "lespoilus/spyc",
