@@ -1,3 +1,1 @@
-/conf/conf.yml
-/lib/composer.lock
-/lib/vendor
+/vendor
