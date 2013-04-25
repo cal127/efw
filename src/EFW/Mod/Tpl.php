@@ -3,6 +3,7 @@
 namespace EFW\Mod;
 
 use \Exception;
+use \EFW\EFW;
 
 
 class Tpl
@@ -50,9 +51,11 @@ class Tpl
 
         return new \Mustache_Engine(array(
             'loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
-              '/../../../app/view'),
+              '/../../../../../../app/' . EFW::$conf['app_namespace'] .
+              '/View'),
             'partials_loader' => new \Mustache_Loader_FilesystemLoader(__DIR__ .
-              '/../../../app/view' . $partials_path),
+              '/../../../../../../app/' . EFW::$conf['app_namespace'] .
+              '/View/' .  $partials_path),
             'helpers' => array_merge($extra_helpers, array(
                 '_url' => function($qs, \Mustache_LambdaHelper $h) {
                     return _url($h->render($qs)); 
