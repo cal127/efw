@@ -35,7 +35,7 @@ class EFW
 
     private static function parseConf()
     {
-        $conf_file = __DIR__ . '/../../../conf/conf.yml';
+        $conf_file = __DIR__ . '/../../../../../conf/conf.yml';
 
         if (!file_exists($conf_file)) {
             throw new Exception('"conf.yml" could not be found.');
@@ -162,7 +162,7 @@ class EFW
     private static function route()
     {
         // generate ctrl and act names
-        $ctrl_ns = '\\' . $conf['app_namespace'] . '\\Ctrl';
+        $ctrl_ns = '\\' . self::$conf['app_namespace'] . '\\Ctrl';
         $ctrl_name = $ctrl_ns . '\\' . ucfirst(self::$ctrl) . 'Ctrl';
         $act_name = self::$act . 'Act';
 
