@@ -77,13 +77,18 @@ class EFW
         // parse query string
         list($ctrl, $act, $params) = sscanf($qs, '%[^/]/%[^/]/%s');
 
+
+        // generate controller name
+        $ctrl_ns = '\\' . self::$conf['app_namespace'] . '\\Ctrl';
+        $ctrl_name = $ctrl_ns . '\\' . ucfirst($ctrl) . 'Ctrl';
+
         // check presence of controller & action
-        if (!method_exists(ucfirst($ctrl) . 'Ctrl', $act . 'Act')) {
+        if (!method_exists($ctrl_name, $act . 'Act')) {
             // Try to redirect to the default action of the ctrl in question
             $act = 'default';
             $params = '';
 
-            if (!method_exists(ucfirst($ctrl) . 'Ctrl', $act . 'Act')) {
+            if (!method_exists($ctrl_name, $act . 'Act')) {
                 $ctrl = 'default';
             }
         }

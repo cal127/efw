@@ -58,7 +58,7 @@ class Tpl
               '/View/' .  $partials_path),
             'helpers' => array_merge($extra_helpers, array(
                 '_url' => function($qs, \Mustache_LambdaHelper $h) {
-                    return _url($h->render($qs)); 
+                    return \EFW\_url($h->render($qs)); 
                 }
             )
         )));
