@@ -1,5 +1,7 @@
 {
+    "name": "cal127/efw",
     "require": {
+        "php": ">=5.3.0",
         "lespoilus/spyc": "master-dev"
     },
     "autoload": {
