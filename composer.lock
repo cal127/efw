@@ -3,29 +3,34 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "4e09e7b5635610f301af15de6ca5d513",
+    "hash": "6ce66162fb540cf68dc739db7b31cbe3",
     "packages": [
         {
-            "name": "lespoilus/spyc",
+            "name": "mustangostang/spyc",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/lespoilus/spyc.git",
-                "reference": "5a5bacdef1e514bdbb30701f13d9867140a6a21b"
+                "url": "https://github.com/mustangostang/spyc.git",
+                "reference": "fc862f916f49edcb7f003e73287f9d946f42fa48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lespoilus/spyc/zipball/5a5bacdef1e514bdbb30701f13d9867140a6a21b",
-                "reference": "5a5bacdef1e514bdbb30701f13d9867140a6a21b",
+                "url": "https://api.github.com/repos/mustangostang/spyc/zipball/fc862f916f49edcb7f003e73287f9d946f42fa48",
+                "reference": "fc862f916f49edcb7f003e73287f9d946f42fa48",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.1"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev"
+                }
+            },
             "autoload": {
                 "files": [
-                    "spyc.php"
+                    "Spyc.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -39,14 +44,13 @@
                 }
             ],
             "description": "A simple YAML loader/dumper class for PHP",
-            "homepage": "https://github.com/lespoius/spyc/",
+            "homepage": "https://github.com/mustangostang/spyc/",
             "keywords": [
                 "spyc",
                 "yaml",
-                "yml",
-                "zf2"
+                "yml"
             ],
-            "time": "2012-10-15 11:52:47"
+            "time": "2013-04-01 09:04:25"
         }
     ],
     "packages-dev": [
@@ -57,7 +61,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "lespoilus/spyc": 20
+        "mustangostang/spyc": 20
     },
     "platform": {
         "php": ">=5.3.0"
