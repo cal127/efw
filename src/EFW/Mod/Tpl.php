@@ -27,9 +27,29 @@ class Tpl
     }
 
 
+    // native template engine, defined below
     private static function initNative()
     {
         self::$engine = new NativeTpl();
+    }
+
+
+    // twig template engine
+    private static function initTwig()
+    {
+        $loader = new \Twig_Loader_Filesystem(__DIR__ .
+            '/../../../../../../app/' . EFW::$conf['app_namespace'] .
+            '/View');
+
+        self::$engine = new \Twig_Environment(
+            $loader,
+            array(
+                'cache' => __DIR__ .
+                    '/../../../../../../app/' . EFW::$conf['app_namespace'] .
+                    '/View/cache',
+                'auto_reload' => true
+            )
+        );
     }
 
 
@@ -62,7 +82,6 @@ class Tpl
                 }
             )
         )));
-
     }
 
 
@@ -111,5 +130,3 @@ class NativeTpl
         return $rarr;
     }
 }
-
-?>

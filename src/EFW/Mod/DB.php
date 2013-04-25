@@ -8,20 +8,22 @@ use \PDO;
 class DB
 {
     public static $pdo;
-    private static $conf, $orm;
+    private static $conf;
 
 
-    public static function init(&$conf) {
+
+    public static function init(&$conf)
+    {
         self::$conf = $conf;
-        $callback = 'init' . ($conf['ORM'] ? ucfirst($conf['ORM']) : 'PDO');
+        
+        // if an orm library is used, init that, else init PDO
+        $callback = 'init' . ($conf['orm'] ? ucfirst($conf['orm']) : 'PDO');
         self::$callback();
     }
 
-    public static function __callStatic($method, $args) {
-        return call_user_func_array(array(self::$orm, $method), $args);
-    }
 
-    public static function initPDO() {
+    public static function initPDO()
+    {
         self::$pdo = new PDO(sprintf('%s:host=%s;dbname=%s;charset=%s',
                                      self::$conf['driver'],
                                      self::$conf['host'],
@@ -36,11 +38,10 @@ class DB
     }
 
 
-
-    private static function initIdiorm() {
-        self::$orm = 'ORM';
-
+    private static function initIdiorm()
+    {
         self::initPDO();
+
         \ORM::set_db(self::$pdo);
 
         $foo = !empty(self::$conf['options']['return_result_sets'])
@@ -48,10 +49,9 @@ class DB
         \ORM::configure('return_result_sets', $foo);
     }
 
-    private static function initParis() {
+
+    private static function initParis()
+    {
         self::initIdiorm();
-        self::$orm = 'Model';
     }
 }
-
-?>

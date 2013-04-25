@@ -150,7 +150,7 @@ class EFW
 
     private static function userConfig()
     {
-        $conf_file = __DIR__ . '/../../conf/conf.php';
+        $conf_file = __DIR__ . '/../../../../../conf/conf.php';
         if (is_file($conf_file)) { self::require_sandbox($conf_file); }
     }
 
@@ -213,6 +213,7 @@ class EFW
         }
     }
 
+
     private static function require_sandbox($filename)
     {
         $f = function() use ($filename) { require $filename; };
@@ -220,5 +221,3 @@ class EFW
     }
     // /utils //////////////////////////////////////////////////////////////////
 }
-
-?>
