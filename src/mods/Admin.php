@@ -1,9 +1,8 @@
 <?php
 
-namespace EFW;
+namespace EFW\Mod;
 
 use \Exception;
-
 
 
 class Admin

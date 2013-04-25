@@ -1,9 +1,12 @@
 <?php
 
-namespace EFW;
+namespace EFW\Mod;
+
 use \PDO;
 
-class DB {
+
+class DB
+{
     public static $pdo;
     private static $conf, $orm;
 

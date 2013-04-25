@@ -3,8 +3,9 @@
 namespace EFW;
 
 use \Exception;
-use \ErrorException
+use \ErrorException;
 use \Spyc;
+use \EFW\Mod\Auth;
 
 
 class EFW
@@ -22,7 +23,6 @@ class EFW
 
     public static function boot()
     {
-        self::setupLibsAndAutoloaders();
         self::parseConf();
         self::setupErrorHandling();
         self::parseQS();
@@ -33,65 +33,9 @@ class EFW
     }
 
 
-    private static function setupLibsAndAutoloaders()
-    {
-        // Import util functions for EFW
-        require_once __DIR__ .  '/utils.php';
-
-        // Autoloader for composer
-        require_once __DIR__ . '/../vendor/autoload.php'; // composer
-
-        // Autoloader for local libs
-        spl_autoload_register(function($class_name)
-        {
-            $lib_dir = __DIR__ . '/..';
-
-            $file = $lib_dir . '/' . $class_name . '.php';
-
-            try {
-                include_once $file;
-            } catch (Exception $e) { }
-        });
-
-        // Autoloader for mods
-        spl_autoload_register(function($class_name)
-        {
-            $class_name = ltrim($class_name, '\\');
-
-            if (strpos($class_name, __NAMESPACE__ . '\\') !== 0) {
-                return;
-            }
-
-            $mod_name = substr($class_name, strlen(__NAMESPACE__) + 1);
-            $file_name = __DIR__ . '/mods/' . $mod_name . '.php';
-
-            try {
-                include_once $file_name;
-            } catch (Exception $e) { }
-        });
-        
-        // Autoloader for models and controllers
-        spl_autoload_register(function($class_name)
-        {
-            $model_dir = __DIR__ . '/../../app/model';
-            $ctrl_dir = __DIR__ . '/../../app/ctrl';
-
-            $file_name = $class_name . '.php';
-
-            try {
-                include_once $model_dir . '/' . $file_name;
-            } catch (Exception $e) {
-                try {
-                    include_once $ctrl_dir . '/' . $file_name;
-                } catch (Exception $e) { }
-            }
-        });
-    }
-
-
     private static function parseConf()
     {
-        $conf_file = __DIR__ . '/../../conf/conf.yml';
+        $conf_file = __DIR__ . '/../../../conf/conf.yml';
 
         if (!file_exists($conf_file)) {
             throw new Exception('"conf.yml" could not be found.');
@@ -164,7 +108,7 @@ class EFW
     private static function loadMod($mod)
     {
         // generate mod class name
-        $mod_cls = __NAMESPACE__ . '\\' . $mod;
+        $mod_cls = __NAMESPACE__ . '\\Mod\\' . $mod;
 
         // check for presence of module
         if (!class_exists($mod_cls, true)) {
@@ -218,7 +162,8 @@ class EFW
     private static function route()
     {
         // generate ctrl and act names
-        $ctrl_name = ucfirst(self::$ctrl) . 'Ctrl';
+        $ctrl_ns = '\\' . $conf['app_namespace'] . '\\Ctrl';
+        $ctrl_name = $ctrl_ns . '\\' . ucfirst(self::$ctrl) . 'Ctrl';
         $act_name = self::$act . 'Act';
 
         // check auth if enabled

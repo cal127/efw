@@ -1,9 +1,13 @@
 <?php
 
-namespace EFW;
-use \PDO, \Exception;
+namespace EFW\Mod;
 
-class Auth {
+use \PDO;
+use \Exception;
+
+
+class Auth
+{
     public static $dependencies = array('Session',
                                         'DB');
     private static $user;

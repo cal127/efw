@@ -1,8 +1,10 @@
 <?php
 
-namespace EFW;
+namespace EFW\Mod;
 
-class Mail {
+
+class Mail
+{
     private static $mailer, $default_from, $default_from_name;
 
     public static function init(&$conf) {

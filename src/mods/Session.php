@@ -1,8 +1,10 @@
 <?php
 
-namespace EFW;
+namespace EFW\Mod;
 
-class Session {
+
+class Session
+{
     public static function init(&$conf) {
         session_start();
     }
