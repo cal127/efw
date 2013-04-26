@@ -11,6 +11,10 @@ class Tpl
     public static $conf;
     private static $engine;
 
+    public static function getEngine()
+    {
+        return self::$engine;
+    }
 
 
     public static function init(&$conf)
@@ -48,6 +52,13 @@ class Tpl
                     '/../../../../../../app/' . EFW::$conf['app_namespace'] .
                     '/View/cache',
                 'auto_reload' => true
+            )
+        );
+
+        self::$engine->addFunction(
+            new \Twig_SimpleFunction(
+                '_url',
+                function($x) { return \EFW\_url($x); }
             )
         );
     }
