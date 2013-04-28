@@ -25,12 +25,6 @@ class Tpl
     }
 
 
-    public static function __callStatic($method, $args)
-    {
-        return call_user_func_array(array(self::$engine, $method), $args);
-    }
-
-
     // native template engine, defined below
     private static function initNative()
     {
