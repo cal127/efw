@@ -178,11 +178,11 @@ class EFW
             }
 
             if (!in_array(Auth::getUserRole(), $ctrl_name::$auth)){
-                Auth::callAuthErrorCallback($ctrl_name::$auth,
-                                            Auth::getUserRole(),
-                                            self::$ctrl,
-                                            self::$act,
-                                            self::$params);
+                Auth::authError($ctrl_name::$auth,
+                                Auth::getUserRole(),
+                                self::$ctrl,
+                                self::$act,
+                                self::$params);
             }
         }
         

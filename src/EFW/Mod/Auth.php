@@ -8,50 +8,127 @@ use \Exception;
 
 class Auth
 {
-    public static $dependencies = array('Session',
-                                        'DB');
-    private static $user;
+    public static $dependencies = array('Session', 'DB');
+
+    private static $user,
+                   $user_id,
+                   $user_username,
+                   $user_role;
+
+    // Callback invoked when authentication error
     private static $auth_error_callback;
 
+    // Callback who populates self::$user variable on init & login & logout
+    private static $update_user_callback;
 
 
-    public static function getUser() { return self::$user; }
-    public static function getUserID() { return self::$user['id']; }
-    public static function getUsername() { return self::$user['username']; }
-    public static function getUserRole() { return self::$user['role']; }
+
+    public static function getUser()
+    {
+        return self::$user;
+    }
+
+
+    public static function getUserID()
+    {
+        return self::$user_id;
+    }
+
+
+    public static function getUsername()
+    {
+        return self::$user_username;
+    }
+
+
+    public static function getUserRole()
+    {
+        return self::$user_role;
+    }
 
 
     public static function init(&$conf)
     {
         self::updateUser();
 
-        self::registerAuthErrorCallback(function ($permitted_roles, $user_role,
-                                                  $ctrl, $act, $params)
-        {
-            exit('Permission denied.');
-        });
+        // Default callback which is called on auth error
+        self::setAuthErrorCallback(
+            array(__CLASS__, 'defaultAuthErrorCallback')
+        );
+    }
+
+
+    public static function setAuthErrorCallback($callable)
+    {
+        self::callableParameterSanityCheck($callable, 5);
+        self::$auth_error_callback = $callable;
+    }
+
+    
+    public static function setUpdateUserCallback($callable)
+    {
+        self::callableParameterSanityCheck($callable, 0);
+        self::$update_user_callback = $callable;
+        self::updateUser();
+    }
+
+
+    private static function defaultAuthErrorCallback(
+        $permitted_roles,
+        $user_role,
+        $ctrl,
+        $act,
+        $params
+    )
+    {
+        exit('Permission denied');
     }
 
 
     public static function updateUser()
     {
         if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
-            self::$user = array('id' => false,
-                                'username' => false,
-                                'role' => false);
-            return;
+            self::$user_id = self::$user_username = self::$user_role = false;
+        } else {
+            self::$user_id = $_SESSION['user']['id'];
+            self::$user_username = $_SESSION['user']['username'];
+            self::$user_role = $_SESSION['user']['role'];
         }
 
-        self::$user = array('id' => $_SESSION['user']['id'],
-                            'username' => $_SESSION['user']['username'],
-                            'role' => $_SESSION['user']['role']);
+        if (!self::$update_user_callback) {
+            self::$user = array(
+                'id' => self::$user_id,
+                'username' => self::$user_username,
+                'role' => self::$user_role
+            );
+        } else {
+            self::$user = call_user_func(self::$update_user_callback);
+        }
     }
 
 
-    public static function registerAuthErrorCallback($callable)
+    public static function authError(
+        $permitted_roles,
+        $user_role,
+        $ctrl,
+        $act,
+        $params
+    )
+    {
+        call_user_func_array(self::$auth_error_callback, func_get_args());
+    }
+
+
+    // Throws an exception if $callable is not a callable
+    // or if the callable hasn't got $num_args parameters
+    private static function callableParameterSanityCheck(
+        $callable,
+        $num_args = 0
+    )
     {
         if (!is_callable($callable)) {
-            throw new Exception('First parameter must be a callable.'); }
+            throw new Exception('First parameter must be a callable.');
+        }
 
         // test whether it's a method or function/closure
         if (is_array($callable)
@@ -62,20 +139,11 @@ class Auth
             $rfa = new \ReflectionFunction($callable);
         }
 
-        if ($rfa->getNumberOfParameters() != 5) {
-            throw new Exception('The callable must have five arguments.');
+        if ($rfa->getNumberOfParameters() != $num_args) {
+            throw new Exception(
+                sprintf('The callable must have %d arguments.', $num_args)
+            );
         }
-
-        self::$auth_error_callback = $callable;
-    }
-
-
-    public static function callAuthErrorCallback($permitted_roles,
-                                                 $user_role,
-                                                 $ctrl,
-                                                 $act,
-                                                 $params) {
-        call_user_func_array(self::$auth_error_callback, func_get_args());
     }
 
 
@@ -110,5 +178,3 @@ class Auth
         self::updateUser();
     }
 }
-
-?>
