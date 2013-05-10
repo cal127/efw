@@ -17,7 +17,8 @@ class EFW
 
 
     // Utility functions //////////////////////////////////////////////////////
-    public static function url($qs) {
+    public static function url($qs)
+    {
         $full_url = EFW::$conf['url'];
         $is_clean = EFW::$conf['clean_urls'];
 
@@ -26,7 +27,7 @@ class EFW
         }
 
         return $full_url . '/index.php?q=' . $qs;
-    };
+    }
 
 
     public static function getCtrl()
