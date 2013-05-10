@@ -16,9 +16,42 @@ class EFW
 
 
 
-    public static function getCtrl() { return self::$ctrl; }
-    public static function getAct() { return self::$act; }
-    public static function getParams() { return self::$params; }
+    // Utility functions //////////////////////////////////////////////////////
+    public static function url($qs) {
+        $full_url = EFW::$conf['url'];
+        $is_clean = EFW::$conf['clean_urls'];
+
+        if ($is_clean || !preg_match('/[a-z0-9\-]/', $qs)) {
+            return $full_url . '/' . $qs;
+        }
+
+        return $full_url . '/index.php?q=' . $qs;
+    };
+
+
+    public static function getCtrl()
+    {
+        return self::$ctrl;
+    }
+
+
+    public static function getAct()
+    {
+        return self::$act;
+    }
+
+
+    public static function getParams()
+    {
+        return self::$params;
+    }
+
+    
+    public static function getURL()
+    {
+        return self::url(self::getCtrl() . '/' . self::getAct());
+    }
+    ///////////////////////////////////////////////////////////////////////////
 
 
     public static function boot()
@@ -64,7 +97,7 @@ class EFW
         self::undo_magic_quotes();
 
         // get query string
-        if (self::$conf['pretty_urls']) {
+        if (self::$conf['clean_urls']) {
             $decoded = urldecode($_SERVER['REQUEST_URI']);
             $inter = array_intersect(explode('/', $decoded),
                                      explode('/', self::$conf['url']));
@@ -191,7 +224,7 @@ class EFW
     }
 
     
-    // utils //////////////////////////////////////////////////////////////////
+    // Helpers ////////////////////////////////////////////////////////////////
     private static function undo_magic_quotes()
     {
         if (get_magic_quotes_gpc()) {
@@ -219,5 +252,5 @@ class EFW
         $f = function() use ($filename) { require $filename; };
         $f();
     }
-    // /utils //////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
 }
