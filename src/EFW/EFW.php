@@ -20,9 +20,8 @@ class EFW
     public static function url($qs)
     {
         $full_url = EFW::$conf['url'];
-        $is_clean = EFW::$conf['clean_urls'];
 
-        if ($is_clean || !preg_match('/[a-z0-9\-]/', $qs)) {
+        if (EFW::$conf['clean_urls']) {
             return $full_url . '/' . $qs;
         }
 
