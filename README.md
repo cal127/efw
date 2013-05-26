@@ -30,8 +30,8 @@ __Missing (To be added/implemented):__
 - Tests
 - Documentation
 
-[comp]: getcomposer.org
-[psr]: github.com/php-fig/fig-standards
-[twig]: twig.sensiolabs.org
-[stache]: mustache.github.io
-[idiorm]: j4mie.github.io/idiormandparis/
+[comp]: http://getcomposer.org
+[psr]: http://github.com/php-fig/fig-standards
+[twig]: http://twig.sensiolabs.org
+[stache]: http://mustache.github.io
+[idiorm]: http://j4mie.github.io/idiormandparis/
