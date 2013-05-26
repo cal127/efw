@@ -81,7 +81,7 @@ class Auth
         $params
     )
     {
-        exit('Permission denied');
+        exit('Permission denied!');
     }
 
 
@@ -131,9 +131,14 @@ class Auth
         }
 
         // test whether it's a method or function/closure
-        if (is_array($callable)
-          || (is_string($callable) && strpos($callable, '::') !== false)) {
-            if (is_string($callable)) { $callable = explode('::', $callable); }
+        if (
+            is_array($callable) ||
+            (is_string($callable) && strpos($callable, '::') !== false)
+        ) {
+            if (is_string($callable)) {
+                $callable = explode('::', $callable);
+            }
+
             $rfa = new \ReflectionMethod($callable[0], $callable[1]);
         } else {
             $rfa = new \ReflectionFunction($callable);
@@ -156,15 +161,19 @@ class Auth
     public static function login($username, $pass)
     {
         $sql = 'SELECT `id`, `username`, `role` FROM `user` '
-          . 'WHERE `username` = ? AND `pass` = SHA1(?);';
+            . 'WHERE `username` = ? AND `pass` = SHA1(?);';
         $stmt = DB::$pdo->prepare($sql);
         $stmt->execute(array($username, $pass));
 
         while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $_SESSION['user'] = array('id' => $user['id'],
-                                      'username' => $user['username'],
-                                      'role'     => $user['role']);
+            $_SESSION['user'] = array(
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'role' => $user['role']
+            );
+
             self::updateUser();
+
             return true;
         }
 
@@ -175,6 +184,7 @@ class Auth
     public static function logout()
     {
         unset($_SESSION['user']);
+
         self::updateUser();
     }
 }
