@@ -1,0 +1,39 @@
+---
+# Site-wide Settings
+core:
+    app_namespace: Demo
+    debug        : Yes
+    url          : http://demo
+    charset      : UTF-8
+    clean_urls  : Yes
+    mods: # Choose which mods to enable below
+        Session: Yes
+        DB     : Yes
+        Auth   : Yes
+        Tpl    : Yes
+        Mail   : No
+        Admin  : No
+mods: # Individual mod settings
+    DB:
+        driver :
+        host   :
+        user   :
+        pass   : 
+        db     :
+        charset:
+        prefix :
+        orm    : # Can either be null, 'idiorm' or 'paris'
+        options: # Further options for selected orm
+            # return_result_sets: Yes # Whether to enable idiorm & paris' return_result_set feature
+    Tpl:
+        engine: twig
+        options:
+            # partials_path: part # Mustache partials_path option
+    Mail: # Fill if mod mail is activated
+        host             : 
+        port             : 
+        user             : 
+        pass             : 
+        default_from     : 
+        default_from_name: 
+...
