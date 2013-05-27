@@ -1,6 +1,6 @@
 This is a minimalistic PHP web framework i've made to use in my projects
 
-This package currently is non-stable, has no documentation available,
+This package currently is unstable, has no documentation available,
 and has some important features missing. Use at your own risk.
 
 __Usage:__
