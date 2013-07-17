@@ -54,9 +54,9 @@ class EFW
     ///////////////////////////////////////////////////////////////////////////
 
 
-    public static function boot()
+    public static function boot($custom_conf_file = null)
     {
-        self::parseConf();
+        self::parseConf($custom_conf_file);
         self::setupErrorHandling();
         self::parseQS();
         self::loadMods();
@@ -66,9 +66,11 @@ class EFW
     }
 
 
-    private static function parseConf()
+    public static function parseConf($custom_conf_file = null)
     {
-        $conf_file = __DIR__ . '/../../../../../conf/conf.yml';
+        $conf_file = $custom_conf_file
+            ? $custom_conf_file
+            : __DIR__ . '/../../../../../conf/conf.yml';
 
         if (!file_exists($conf_file)) {
             throw new Exception('"conf.yml" could not be found.');
