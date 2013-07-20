@@ -1,0 +1,2 @@
+#!/bin/bash
+expect -c "spawn php -a; send \"require_once 'vendor/autoload.php';\n \\\\EFW\\\\EFW::shellBoot();\n\"; interact;"

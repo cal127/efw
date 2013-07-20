@@ -6,11 +6,15 @@ and has some important features missing. Use at your own risk.
 __Usage:__
 
 To use, copy the demo folder, rename it to your project name,
-open 'composer.json' and delete the packages you won't need, then run 'composer install'
-to install the packages and dependencies into the vendor folder. Install
-composer first if it's not already installed.
+open 'composer.json' and delete the packages you won't need,
+then run 'composer install' to install the packages and dependencies
+into the vendor folder. Install composer first if it's not already installed.
 
 Configure the conf/conf.yml file
+
+You can also create a conf/conf.php file to be executed during boot
+
+Copy the 'messaround' executable to your project root folder
 
 __Features:__
 

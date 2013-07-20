@@ -66,6 +66,15 @@ class EFW
     }
 
 
+    public static function shellBoot($custom_conf_file = null)
+    {
+        self::parseConf($custom_conf_file);
+        self::setupErrorHandling();
+        self::loadMods();
+        self::userConfig();
+    }
+
+
     public static function parseConf($custom_conf_file = null)
     {
         $conf_file = $custom_conf_file
