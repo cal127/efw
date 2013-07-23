@@ -18,21 +18,21 @@ Copy the 'messaround' executable to your project root folder
 
 __Features:__
 
-- MVC architecture
-- Works with [Composer][comp] dependency manager
+- MVC
+- Works with [Composer][comp]
 - [PSR][psr] compatible
-- Supports clean URLs
+- Clean URLs
 - Modular, can be extended with custom modules
-- Templating support for [Twig][twig] and [Mustache][stache] template engines
+- Built-in support for [Mustache][stache] and [Twig][twig] template engines
 - Built-in support for [Idiorm and Paris][idiorm] ORM libraries
 
-__Missing (To be added/implemented):__
+__Missing Features (To be added):__
 
-- Routing
-- Logging
-- Filtering
-- Tests
-- Documentation
+- Routing module
+- Logging module
+- Filtering utilities
+- PHPUnit Tests
+- And of course, Documentation
 
 [comp]: http://getcomposer.org
 [psr]: http://github.com/php-fig/fig-standards
