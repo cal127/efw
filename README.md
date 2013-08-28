@@ -26,14 +26,6 @@ __Features:__
 - Built-in support for [Mustache][stache] and [Twig][twig] template engines
 - Built-in support for [Idiorm and Paris][idiorm] ORM libraries
 
-__Missing Features (To be added):__
-
-- Routing module
-- Logging module
-- Filtering utilities
-- PHPUnit Tests
-- And of course, Documentation
-
 [comp]: http://getcomposer.org
 [psr]: http://github.com/php-fig/fig-standards
 [twig]: http://twig.sensiolabs.org
