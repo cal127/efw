@@ -221,7 +221,7 @@ class EFW
                 $ctrl_name::$auth = array($ctrl_name::$auth);
             }
 
-            if (!in_array(Auth::getUserRole(), $ctrl_name::$auth)){
+            if (!(Auth::getUserRole() & $ctrl_name::$auth)) {
                 Auth::authError($ctrl_name::$auth,
                                 Auth::getUserRole(),
                                 self::$ctrl,
