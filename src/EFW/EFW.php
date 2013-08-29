@@ -217,10 +217,6 @@ class EFW
 
         // check auth if enabled
         if (in_array('Auth', self::$mods_enabled) && isset($ctrl_name::$auth)) {
-            if (!is_array($ctrl_name::$auth)) {
-                $ctrl_name::$auth = array($ctrl_name::$auth);
-            }
-
             if (!(Auth::getUserRole() & $ctrl_name::$auth)) {
                 Auth::authError($ctrl_name::$auth,
                                 Auth::getUserRole(),
