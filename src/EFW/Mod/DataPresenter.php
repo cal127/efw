@@ -249,8 +249,9 @@ class DataPresenter
 
             list($rel_obj, $rel_field) = explode('.', $field['relation']);
             $items = Model::factory(ucwords($rel_obj))
-                ->select_many('id', $rel_field)
+                ->select_many(array('value' => 'id'), array('text' => $rel_field))
                 ->find_array();
+
             $widgets[$field['name']] = $items;
         }
 
