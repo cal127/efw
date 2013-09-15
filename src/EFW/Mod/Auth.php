@@ -13,13 +13,18 @@ class Auth
     private static $user,
                    $user_id,
                    $user_username,
-                   $user_role;
+                   $user_perms;
 
     // Callback invoked when authentication error
     private static $auth_error_callback;
 
     // Callback who populates self::$user variable on init & login & logout
     private static $update_user_callback;
+
+    // table names
+    public static $user_table = 'user',
+                  $user_perm_table = 'user_perm',
+                  $perm_table = 'perm';
 
 
 
@@ -41,9 +46,9 @@ class Auth
     }
 
 
-    public static function getUserRole()
+    public static function getUserPerms()
     {
-        return self::$user_role;
+        return self::$user_perms;
     }
 
 
@@ -74,8 +79,8 @@ class Auth
 
 
     private static function defaultAuthErrorCallback(
-        $permitted_roles,
-        $user_role,
+        $required_perm,
+        $user_perms,
         $ctrl,
         $act,
         $params
@@ -88,18 +93,19 @@ class Auth
     public static function updateUser()
     {
         if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
-            self::$user_id = self::$user_username = self::$user_role = false;
+            self::$user_id = self::$user_username = false;
+            self::$user_perms = array();
         } else {
             self::$user_id = $_SESSION['user']['id'];
             self::$user_username = $_SESSION['user']['username'];
-            self::$user_role = $_SESSION['user']['role'];
+            self::$user_perms = $_SESSION['user']['perms'];
         }
 
         if (!self::$update_user_callback) {
             self::$user = array(
                 'id' => self::$user_id,
                 'username' => self::$user_username,
-                'role' => self::$user_role
+                'perms' => self::$user_perms
             );
         } else {
             self::$user = call_user_func(self::$update_user_callback);
@@ -108,8 +114,8 @@ class Auth
 
 
     public static function authError(
-        $permitted_roles,
-        $user_role,
+        $required_perm,
+        $user_perms,
         $ctrl,
         $act,
         $params
@@ -160,16 +166,31 @@ class Auth
 
     public static function login($username, $pass)
     {
-        $sql = 'SELECT `id`, `username`, `role` FROM `user` '
-            . 'WHERE `username` = ? AND `pass` = SHA1(?);';
+        $sql_tpl = 'SELECT u.id, u.username'
+                 . ', GROUP_CONCAT(p.id) AS perms'
+                 . ', GROUP_CONCAT(p.title) AS perm_titles'
+                 . ' FROM `%s` u'
+                 . ' INNER JOIN `%s` up ON u.id = up.user_id'
+                 . ' INNER JOIN `%s` p ON p.id = up.perm_id'
+                 . ' WHERE u.username = ? AND u.pass = SHA1(?);';
+
+        $sql = sprintf(
+            $sql_tpl, self::$user_table, self::$user_perm_table, self::$perm_table
+        );
+
         $stmt = DB::$pdo->prepare($sql);
         $stmt->execute(array($username, $pass));
 
         while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if (is_null($user['id'])) { return false; }
+
             $_SESSION['user'] = array(
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'role' => $user['role']
+                'id'        => $user['id'],
+                'username'  => $user['username'],
+                'perms'     => array_combine(
+                    explode(',', $user['perm_titles']),
+                    explode(',', $user['perms'])
+                )
             );
 
             self::updateUser();
