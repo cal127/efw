@@ -118,6 +118,8 @@ class EFW
             $qs = !empty($_GET['q']) ? $_GET['q'] : '';
         }
 
+        self::redirect($qs);
+
         // parse query string
         list($ctrl, $act, $params) = sscanf($qs, '%[^/]/%[^/]/%s');
 
@@ -141,6 +143,28 @@ class EFW
         self::$ctrl = $ctrl;
         self::$act = $act;
         self::$params = $params;
+    }
+
+
+    private static function redirect($qs)
+    {
+        // apply redirection rules
+        $redirects_file = __DIR__ . '/../../../../../conf/redirect.yml';
+
+        if (file_exists($redirects_file)) {
+            $current_route = str_replace('/', ':', $qs);
+
+            $patterns = Spyc::YAMLLoad($redirects_file);
+            
+            foreach ($patterns as $route_pattern => $redirect_pattern) {
+                $route_pattern = '/' . $route_pattern . '/';
+
+                if (preg_match($route_pattern, $current_route)) {
+                    $redirect_to = str_replace(':', '/', preg_replace($route_pattern, $redirect_pattern, $current_route));
+                    header('Location: /' . $redirect_to);
+                }
+            }
+        }
     }
 
 
@@ -210,24 +234,6 @@ class EFW
 
     private static function route()
     {
-        // apply redirection rules
-        $routes_file = __DIR__ . '/../../../../../conf/routes.yml';
-
-        if (file_exists($routes_file)) {
-            $current_route = str_replace('/', '.', self::$ctrl . '/' . self::$act . '/' . self::$params);
-
-            $patterns = Spyc::YAMLLoad($routes_file);
-            
-            foreach ($patterns as $route_pattern => $redirect_pattern) {
-                $route_pattern = '/' . $route_pattern . '/';
-
-                if (preg_match($route_pattern, $current_route)) {
-                    $redirect_to = str_replace('.', '/', preg_replace($route_pattern, $redirect_pattern, $current_route));
-                    header('Location: /' . $redirect_to);
-                }
-            }
-        }
-
         // generate ctrl and act names
         $ctrl_ns = '\\' . self::$conf['app_namespace'] . '\\Ctrl';
         $ctrl_name = $ctrl_ns . '\\' . ucfirst(self::$ctrl) . 'Ctrl';
