@@ -210,6 +210,24 @@ class EFW
 
     private static function route()
     {
+        // apply redirection rules
+        $routes_file = __DIR__ . '/../../../../../conf/routes.yml';
+
+        if (file_exists($routes_file)) {
+            $current_route = str_replace('/', '.', self::$ctrl . '/' . self::$act . '/' . self::$params);
+
+            $patterns = Spyc::YAMLLoad($routes_file);
+            
+            foreach ($patterns as $route_pattern => $redirect_pattern) {
+                $route_pattern = '/' . $route_pattern . '/';
+
+                if (preg_match($route_pattern, $current_route)) {
+                    $redirect_to = str_replace('.', '/', preg_replace($route_pattern, $redirect_pattern, $current_route));
+                    header('Location: /' . $redirect_to);
+                }
+            }
+        }
+
         // generate ctrl and act names
         $ctrl_ns = '\\' . self::$conf['app_namespace'] . '\\Ctrl';
         $ctrl_name = $ctrl_ns . '\\' . ucfirst(self::$ctrl) . 'Ctrl';
@@ -217,7 +235,13 @@ class EFW
 
         // check auth if enabled
         if (in_array('Auth', self::$mods_enabled) && isset($ctrl_name::$perm)) {
-            if (!in_array($ctrl_name::$perm, Auth::getUserPerms())) {
+            if (!is_array($ctrl_name::$perm)) {
+                $ctrl_name::$perm = array($ctrl_name::$perm);
+            }
+
+            if (
+                !count(array_intersect($ctrl_name::$perm, Auth::getUserPerms()))
+            ) {
                 Auth::authError(
                     $ctrl_name::$perm,
                     Auth::getUserPerms(),
